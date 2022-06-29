@@ -2,6 +2,26 @@
 
 import {createReducer, createAction, Action} from '@reduxjs/toolkit';
 
+
+// board state/actions
+//   {
+//      values: []
+//   }
+
+
+export const setBoard = createAction<number[]>('board/setBoard');
+
+export const boardReducer = createReducer({}, (builder) => {
+  builder.addCase(setBoard, (state, action) => {
+    if (setBoard.match(action)) {
+      return action.payload;
+    }
+  });
+});
+
+
+/* playground below here */
+
 const increment = createAction<string>('counter/increment');
 export const counterReducer = createReducer('x', (builder) => {
   builder.addCase(increment, (state, action) => action.payload.toUpperCase());

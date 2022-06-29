@@ -6,9 +6,17 @@
 - subscribes to user input and updates board state
 
  */
+import store from '../store';
 
 export class BoardManager {
-  x = 1;
+  constructor() {
+    store.subscribe(() => this.stateUpdated());
+  }
+
+  stateUpdated() {
+    console.log('state updated in board manager');
+    console.log(store.getState().board);
+  }
 
   receiveInput() {
     // what cell was tapped
@@ -16,7 +24,7 @@ export class BoardManager {
   }
 
   get boardState() {
-    return this.x;
+    return 33;
   }
 }
 

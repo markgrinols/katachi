@@ -1,20 +1,20 @@
 /* eslint-disable require-jsdoc */
 import Phaser from 'phaser';
-// import {boardManager} from './boardManager';
+import {BoardManager} from './boardManager';
 import store from '../store';
-import {addToDoCreator} from '../reducers'
+import {setBoard} from '../reducers';
 
 export default class Demo extends Phaser.Scene {
+  boardManager: BoardManager;
+
   constructor() {
     super('GameScene');
+    this.boardManager = new BoardManager();
   }
 
   preload() {
     //    this.load.image('logo', 'assets/phaser3-logo.png');
-    //    console.log(`loaded data: ${boardManager.loadBoard()}`)
-    store.dispatch(addToDoCreator({text: 'help me'}));
-    store.dispatch({type: 'ADD_TO_DO', payload: {text: 'no i willent'}});
-    console.log(store.getState().todos);
+    store.dispatch(setBoard([1, 2, 3, 3, 2, 1, 2, 2, 2]));
   }
 
   create() {
