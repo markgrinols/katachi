@@ -1,6 +1,8 @@
 /* eslint-disable require-jsdoc */
 import Phaser from 'phaser';
 // import {boardManager} from './boardManager';
+import store from '../store';
+import {addToDoCreator} from '../reducers'
 
 export default class Demo extends Phaser.Scene {
   constructor() {
@@ -10,6 +12,9 @@ export default class Demo extends Phaser.Scene {
   preload() {
     //    this.load.image('logo', 'assets/phaser3-logo.png');
     //    console.log(`loaded data: ${boardManager.loadBoard()}`)
+    store.dispatch(addToDoCreator({text: 'help me'}));
+    store.dispatch({type: 'ADD_TO_DO', payload: {text: 'no i willent'}});
+    console.log(store.getState().todos);
   }
 
   create() {
