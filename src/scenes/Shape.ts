@@ -50,21 +50,20 @@ export default class Shape {
     switch (dir) {
       case Direction.None:
         this.currentChild = this.scene.add.rectangle(this.x, this.y,
-            this.cellWidth * 0.99, this.cellHeight * 0.99, 0x0)
-            .setAlpha(0.01);
+            this.cellWidth, this.cellHeight, 0x0).setAlpha(0.01);
         break;
       case Direction.Circle:
         this.currentChild = this.scene.add.circle(this.x, this.y,
-            this.cellWidth * 0.35, 0x666600);
+            this.cellWidth * 0.30, 0x666600);
         break;
       case Direction.Triangle:
         const ha = 35;
         this.currentChild = this.scene.add.triangle(this.x, this.y,
-            0, ha, ha, ha, ha/2, -5, 0x00FF00);
+            0, ha, ha, ha, ha/2, 0, 0x00FF00);
         break;
       case Direction.Square:
         this.currentChild = this.scene.add.rectangle(this.x, this.y,
-            this.cellWidth * 0.99, this.cellHeight * 0.99, 0x6666ff);
+            this.cellWidth, this.cellHeight, 0x6666ff).setScale(0.6);
         break;
       case Direction.Diamond:
         this.currentChild = this.scene.add.sprite(this.x, this.y, 'diamond')

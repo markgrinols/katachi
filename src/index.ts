@@ -23,11 +23,7 @@ new Controller();
 /*
 
 todo:
- - draw a shape
- - update shape based on data values
-
  - load board data from file on remote endpoint
- - add shape shifting logic
  - when cell changes, evaluate good/bad
  - build out board in renderer after cols/rows has been set
 */
