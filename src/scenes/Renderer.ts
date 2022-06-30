@@ -16,6 +16,7 @@ export default class Renderer extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image('diamond', 'assets/diamond.png');
   }
 
   onStateUpdated() {
@@ -31,7 +32,9 @@ export default class Renderer extends Phaser.Scene {
       boardState.cellUpdates.forEach( (update) => {
         const index = update[0];
         const value = update[1];
-        this.cells[index].setDebugLabel(value);
+        const shape = this.cells[index];
+        shape.setDebugLabel(value);
+        shape.setShape(value as Direction); // only do this when data updates
       });
       store.dispatch(updateCells([]));
     }
@@ -64,7 +67,6 @@ export default class Renderer extends Phaser.Scene {
       const shape: Shape = new Shape(this, x, y, row, col,
           cellWidth, cellHeight);
       this.cells.push(shape);
-      shape.setShape(Direction.Circle); // only do this when data updates
     }
 
     this.add.text(0, 0, (new Date()).toString(),

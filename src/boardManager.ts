@@ -21,7 +21,7 @@ export class BoardManager {
 
       const index = state.board.cols * row + col;
       const currVal = state.board.cells[index];
-      const payload = [index, currVal + 1];
+      const payload = [index, (currVal + 1)% 5];
       const cellUpdates = [payload];
       store.dispatch(updateCells({cellUpdates}));
     }
@@ -31,7 +31,7 @@ export class BoardManager {
       store.dispatch(loadBoardDataNow(false));
       console.log(`load data now: ${appState.loadBoardDataNow}`);
 
-      const boardData = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+      const boardData = [0, 1, 2, 3, 0, 3, 2, 0, 1];
       const rows = 3;
       const cols = 3;
 

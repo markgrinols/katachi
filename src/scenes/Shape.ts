@@ -5,9 +5,10 @@ import {userClicked} from '../reducers/input';
 import Renderer from './Renderer';
 
 export enum Direction {
-  Circle = 1,
+  None = 0,
+  Circle,
   Square,
-  Triange,
+  Triangle,
   Diamond,
 }
 
@@ -19,7 +20,7 @@ export default class Shape {
   col;
   cellWidth;
   cellHeight;
-  currentChild!: Phaser.GameObjects.GameObject;
+  currentChild!: Phaser.GameObjects.GameObject | null;
   debugLabel: Phaser.GameObjects.Text;
 
   constructor(scene: Renderer,
@@ -33,29 +34,53 @@ export default class Shape {
     this.cellWidth = cellWidth;
     this.cellHeight = cellHeight;
 
-    this.debugLabel = scene.add.text(x - 8, y - 5, 'd',
+    this.debugLabel = scene.add.text(x - 8, y - 5, '',
         {fontSize: '16px', color: '#000'});
     this.debugLabel.setDepth(10);
   }
 
+  tryRemoveCurrentChild() {
+    this.currentChild?.destroy();
+    this.currentChild = null;
+  }
+
   setShape(dir: Direction) {
-    if (this.currentChild) {
-      this.currentChild.destroy();
+    this.tryRemoveCurrentChild();
+
+    switch (dir) {
+      case Direction.None:
+        this.currentChild = this.scene.add.rectangle(this.x, this.y,
+            this.cellWidth * 0.99, this.cellHeight * 0.99, 0x0)
+            .setAlpha(0.01);
+        break;
+      case Direction.Circle:
+        this.currentChild = this.scene.add.circle(this.x, this.y,
+            this.cellWidth * 0.35, 0x666600);
+        break;
+      case Direction.Triangle:
+        const ha = 35;
+        this.currentChild = this.scene.add.triangle(this.x, this.y,
+            0, ha, ha, ha, ha/2, -5, 0x00FF00);
+        break;
+      case Direction.Square:
+        this.currentChild = this.scene.add.rectangle(this.x, this.y,
+            this.cellWidth * 0.99, this.cellHeight * 0.99, 0x6666ff);
+        break;
+      case Direction.Diamond:
+        this.currentChild = this.scene.add.sprite(this.x, this.y, 'diamond')
+            .setScale(0.6).setTintFill(0xF0C0FF);
+        break;
+      default:
+        throw new Error();
     }
 
-    this.currentChild = this.scene.add.rectangle(this.x, this.y,
-        this.cellWidth * 0.99, this.cellHeight * 0.99, 0x6666ff);
-
-    // this.currentChild.setData('row', row);
-    // this.currentChild.setData('col', col);
     this.currentChild.setInteractive();
     this.currentChild.on('clicked', (go: Phaser.GameObjects.Rectangle) => {
-      // console.log(`row ${row} col ${col}`);
       store.dispatch(userClicked([this.row, this.col]));
     }, this);
   }
 
   setDebugLabel(s: string) {
-    this.debugLabel.text = s;
+    // this.debugLabel.text = s;
   }
 }
