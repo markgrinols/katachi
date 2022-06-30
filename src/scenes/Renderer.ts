@@ -3,11 +3,14 @@ import Phaser from 'phaser';
 import store from '../store';
 import {userClicked} from '../reducers/input';
 import {loadBoardDataNow} from '../reducers/app';
+import {updateCells} from '../reducers/board';
 
 
 export default class Renderer extends Phaser.Scene {
   cells: Array<Phaser.GameObjects.Rectangle> = [];
   labels: Array<Phaser.GameObjects.Text> = [];
+  numRows = 0;
+  numCols = 0;
 
   constructor() {
     super('Renderer');
@@ -18,6 +21,22 @@ export default class Renderer extends Phaser.Scene {
   }
 
   stateUpdated() {
+    //  scenarios - full board update, single cell udpate
+    const state = store.getState();
+    const boardState = state.board;
+    if (this.numRows == 0 && boardState.rows > 0) {
+      this.numRows = boardState.rows;
+      this.numCols = boardState.cols;
+    }
+
+    if (boardState.cellUpdates && boardState.cellUpdates.length > 0) {
+      boardState.cellUpdates.forEach( (update) => {
+        const index = update[0];
+        const value = update[1];
+        this.labels[index].text = value;
+      });
+      store.dispatch(updateCells([]));
+    }
   }
 
   create() {
