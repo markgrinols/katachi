@@ -6,10 +6,10 @@ import {updateCells, setRowsCols} from './reducers/board';
 
 export class BoardManager {
   constructor() {
-    store.subscribe(() => this.stateUpdated());
+    store.subscribe(() => this.onStateUpdated());
   }
 
-  stateUpdated() {
+  onStateUpdated() {
     const state = store.getState();
 
     const inputState = state.input;

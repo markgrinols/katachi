@@ -1,86 +1,77 @@
 /* eslint-disable require-jsdoc */
 import Phaser from 'phaser';
 import store from '../store';
-import {userClicked} from '../reducers/input';
 import {loadBoardDataNow} from '../reducers/app';
 import {updateCells} from '../reducers/board';
-
+import Shape, {Direction} from './Shape';
 
 export default class Renderer extends Phaser.Scene {
-  cells: Array<Phaser.GameObjects.Rectangle> = [];
-  labels: Array<Phaser.GameObjects.Text> = [];
+  cells: Array<Shape> = [];
   numRows = 0;
   numCols = 0;
 
   constructor() {
     super('Renderer');
-    store.subscribe(() => this.stateUpdated());
+    store.subscribe(() => this.onStateUpdated());
   }
 
   preload() {
   }
 
-  stateUpdated() {
-    //  scenarios - full board update, single cell udpate
+  onStateUpdated() {
     const state = store.getState();
     const boardState = state.board;
     if (this.numRows == 0 && boardState.rows > 0) {
       this.numRows = boardState.rows;
       this.numCols = boardState.cols;
+      this.customCreate();
     }
 
     if (boardState.cellUpdates && boardState.cellUpdates.length > 0) {
       boardState.cellUpdates.forEach( (update) => {
         const index = update[0];
         const value = update[1];
-        this.labels[index].text = value;
+        this.cells[index].setDebugLabel(value);
       });
       store.dispatch(updateCells([]));
     }
   }
 
   create() {
-    const numRows: integer = 3;
-    const numCols: integer = 3;
-    const cellWidth: integer = 50;
+    this.add.circle(400, 300, 2, 0xFF0000).setDepth(2);
+    store.dispatch(loadBoardDataNow(true));
+  }
+
+  customCreate() {
+    const cellWidth: integer = 50; // todo: calc this based on row/cols
     const cellHeight: integer = 50;
-    const containerX: integer = 400 - (0.5 * numCols * cellWidth);
-    const containerY: integer = 300 - (0.5 * numRows * cellHeight);
 
-    const container = this.add.container(containerX, containerY);
+    const boardWidth = cellWidth * this.numCols;
+    const boardHeight = cellHeight * this.numRows;
 
-    for (let i = 0; i < numRows * numCols; i++) {
-      const col: integer = i % numCols;
-      const row: integer = ~~(i / numCols);
-      const x = col * cellWidth;
-      const y = row * cellHeight;
-      const r = this.add.rectangle(x, y, cellWidth * 0.99,
-          cellHeight * 0.99, 0x6666ff);
-      r.setData('row', row);
-      r.setData('col', col);
-      r.setInteractive();
-      r.on('clicked', (go: Phaser.GameObjects.Rectangle) => {
-        // console.log(`row ${row} col ${col}`);
-        go.fillColor = Math.random() * 0xFFFFFF;
-        store.dispatch(userClicked([row, col]));
-      }, this);
+    // const containerX: integer = 400 - (0.5 * numCols * cellWidth);
+    // const containerY: integer = 300 - (0.5 * numRows * cellHeight);
 
-      this.labels.push(this.add.text(x, y, 'x',
-          {fontSize: '16px', color: '#000'}));
+    for (let i = 0; i < this.numRows * this.numCols; i++) {
+      const col: integer = i % this.numCols;
+      const row: integer = ~~(i / this.numCols);
 
-      this.cells.push(r);
+      const x = cellWidth * (col - ~~(this.numCols / 2)) +
+            this.sys.game.canvas.width / 2;
+      const y = cellHeight * (row - ~~(this.numRows / 2)) +
+            this.sys.game.canvas.height / 2;
+
+      const shape: Shape = new Shape(this, x, y, row, col,
+          cellWidth, cellHeight);
+      this.cells.push(shape);
+      shape.setShape(Direction.Circle); // only do this when data updates
     }
 
-    container.add(this.cells);
-    container.add(this.labels);
-
     this.add.text(0, 0, (new Date()).toString(),
-        {fontSize: '16px', color: '#000'});
+        {fontSize: '12px', color: '#000'});
 
     this.input.on('gameobjectup', function(pointer: any, gameObject: any) {
       gameObject.emit('clicked', gameObject);
     }, this);
-
-    store.dispatch(loadBoardDataNow(true));
   }
 }
