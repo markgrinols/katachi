@@ -1,7 +1,9 @@
 /* eslint-disable require-jsdoc */
 import Phaser from 'phaser';
 import store from '../store';
-import {setBoard} from '../reducers';
+import {userClicked} from '../reducers/input';
+import {loadBoardDataNow} from '../reducers/app';
+
 
 export default class Renderer extends Phaser.Scene {
   cells: Array<Phaser.GameObjects.Rectangle> = [];
@@ -13,13 +15,9 @@ export default class Renderer extends Phaser.Scene {
   }
 
   preload() {
-    //    this.load.image('logo', 'assets/phaser3-logo.png');
-    store.dispatch(setBoard([1, 2, 3, 3, 2, 1, 2, 2, 2]));
   }
 
   stateUpdated() {
-    console.log('stateUpdated on Renderer');
-    this.labels[0].text = 'foo';
   }
 
   create() {
@@ -45,6 +43,7 @@ export default class Renderer extends Phaser.Scene {
       r.on('clicked', (go: Phaser.GameObjects.Rectangle) => {
         console.log(`row ${row} col ${col}`);
         go.fillColor = Math.random() * 0xFFFFFF;
+        store.dispatch(userClicked([row, col]));
       }, this);
 
       this.labels.push(this.add.text(x, y, 'x',
@@ -62,6 +61,8 @@ export default class Renderer extends Phaser.Scene {
     this.input.on('gameobjectup', function(pointer: any, gameObject: any) {
       gameObject.emit('clicked', gameObject);
     }, this);
+
+    store.dispatch(loadBoardDataNow(true));
   }
 }
 
