@@ -18,8 +18,6 @@ export default class Renderer extends Phaser.Scene {
   }
 
   stateUpdated() {
-    // console.log('renderer stateupdated');
-    // console.log(store.getState());
   }
 
   create() {
