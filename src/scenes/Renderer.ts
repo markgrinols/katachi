@@ -84,25 +84,3 @@ export default class Renderer extends Phaser.Scene {
     store.dispatch(loadBoardDataNow(true));
   }
 }
-
-
-/*
-Game -
-  - sets up redux
-BoardLoader
-  - downloads, provides puzzle data
-BoardManager
-  - manages game state
-Renderer
-  - draws board based on game state
-  - detects/forwards input events
-  -
-
-
-todo:
- - add shape shifting logic
- - load up the matrix based onm data to start
- - when cell changes, evaluate good/bad
- - unod
-
-*/

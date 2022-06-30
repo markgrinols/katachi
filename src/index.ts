@@ -19,3 +19,12 @@ class Controller {
 }
 
 new Controller();
+
+/*
+
+todo:
+ - load board data from file on remote endpoint
+ - add shape shifting logic
+ - when cell changes, evaluate good/bad
+
+*/

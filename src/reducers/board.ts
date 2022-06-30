@@ -23,9 +23,6 @@ const boardSlice = createSlice({
   },
 });
 
-// Extract the action creators object and the reducer
 const {actions, reducer} = boardSlice;
-// Extract and export each action creator by name
 export const {updateCells, setRowsCols} = actions;
-// Export the reducer, either as a default or named export
 export default reducer;
