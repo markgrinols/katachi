@@ -1,12 +1,14 @@
 import {configureStore} from '@reduxjs/toolkit';
-import {todoReducer, boardReducer} from './reducers';
+import input from './reducers/input';
+import app from './reducers/app';
 
 const store = configureStore({
   reducer: {
-    todos: todoReducer,
-    board: boardReducer,
+    input,
+    app,
   },
 });
+
 console.log('store module code ran');
 
 export default store;

@@ -1,19 +1,23 @@
 /* eslint-disable require-jsdoc */
-
 import {createReducer, createAction, Action} from '@reduxjs/toolkit';
 
+/*
+export const rendererInializedAction =
+      createAction<boolean>('renderer/initialized');
+export const rendererReducer =
+      createReducer({initialized: false}, (builder) => {
+        builder.addCase(rendererInializedAction, (state, action) => {
+          if (rendererInializedAction.match(action)) {
+            state.initialized = action.payload;
+          }
+        });
+      });
+*/
 
-// board state/actions
-//   {
-//      values: []
-//   }
-
-
-export const setBoard = createAction<number[]>('board/setBoard');
-
-export const boardReducer = createReducer({}, (builder) => {
-  builder.addCase(setBoard, (state, action) => {
-    if (setBoard.match(action)) {
+export const setBoardAction = createAction<number[]>('board/setBoard');
+export const boardReducer = createReducer([] as number[], (builder) => {
+  builder.addCase(setBoardAction, (state, action) => {
+    if (setBoardAction.match(action)) {
       return action.payload;
     }
   });

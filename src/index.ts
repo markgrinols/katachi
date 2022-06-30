@@ -2,7 +2,6 @@
 import Phaser from 'phaser';
 import config from './config';
 import Renderer from './scenes/Renderer';
-import store from './store';
 import {BoardManager} from './boardManager';
 
 class Controller {
@@ -16,7 +15,6 @@ class Controller {
           scene: [Renderer],
         }),
     );
-
   }
 }
 
