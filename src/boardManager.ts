@@ -9,15 +9,18 @@ export class BoardManager {
   }
 
   stateUpdated() {
-    const inputState = store.getState().input;
-    if (inputState.length > 0) {
-      const row = inputState[0];
-      const col = inputState[1];
+    const state = store.getState();
+    // console.log('boardmanager stateupdated');
+    // console.log(state);
+    const inputState = state.input;
+    if (inputState.click.length === 2) {
+      const row = inputState.click[0];
+      const col = inputState.click[1];
       console.log(`User clicked at: ${row} ${col}`);
       store.dispatch(clearUserClicked(null));
     }
 
-    const appState = store.getState().app;
+    const appState = state.app;
     if (appState.loadBoardDataNow) {
       console.log(`load data now: ${appState.loadBoardDataNow}`);
       store.dispatch(loadBoardDataNow(false));

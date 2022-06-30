@@ -3,13 +3,13 @@ import {createSlice} from '@reduxjs/toolkit';
 
 const inputSlice = createSlice({
   name: 'input',
-  initialState: [],
+  initialState: {click: []},
   reducers: {
     userClicked(state, action) {
-      state = action.payload;
+      state.click = action.payload;
     },
     clearUserClicked(state, action) {
-      state = [];
+      state.click = [];
     },
   },
 });

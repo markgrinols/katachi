@@ -18,6 +18,8 @@ export default class Renderer extends Phaser.Scene {
   }
 
   stateUpdated() {
+    // console.log('renderer stateupdated');
+    // console.log(store.getState());
   }
 
   create() {
@@ -41,7 +43,7 @@ export default class Renderer extends Phaser.Scene {
       r.setData('col', col);
       r.setInteractive();
       r.on('clicked', (go: Phaser.GameObjects.Rectangle) => {
-        console.log(`row ${row} col ${col}`);
+        // console.log(`row ${row} col ${col}`);
         go.fillColor = Math.random() * 0xFFFFFF;
         store.dispatch(userClicked([row, col]));
       }, this);
