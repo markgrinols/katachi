@@ -7,6 +7,6 @@ const store = configureStore({
     board: boardReducer,
   },
 });
-console.log('store construcgtor ran');
+console.log('store module code ran');
 
 export default store;

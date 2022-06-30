@@ -1,20 +1,25 @@
 /* eslint-disable require-jsdoc */
 import Phaser from 'phaser';
-import {BoardManager} from './boardManager';
 import store from '../store';
 import {setBoard} from '../reducers';
 
-export default class Demo extends Phaser.Scene {
-  boardManager: BoardManager;
+export default class Renderer extends Phaser.Scene {
+  cells: Array<Phaser.GameObjects.Rectangle> = [];
+  labels: Array<Phaser.GameObjects.Text> = [];
 
   constructor() {
-    super('GameScene');
-    this.boardManager = new BoardManager();
+    super('Renderer');
+    store.subscribe(() => this.stateUpdated());
   }
 
   preload() {
     //    this.load.image('logo', 'assets/phaser3-logo.png');
     store.dispatch(setBoard([1, 2, 3, 3, 2, 1, 2, 2, 2]));
+  }
+
+  stateUpdated() {
+    console.log('stateUpdated on Renderer');
+    this.labels[0].text = 'foo';
   }
 
   create() {
@@ -26,7 +31,6 @@ export default class Demo extends Phaser.Scene {
     const containerY: integer = 300 - (0.5 * numRows * cellHeight);
 
     const container = this.add.container(containerX, containerY);
-    const cells: Array<Phaser.GameObjects.Rectangle> = [];
 
     for (let i = 0; i < numRows * numCols; i++) {
       const col: integer = i % numCols;
@@ -42,10 +46,15 @@ export default class Demo extends Phaser.Scene {
         console.log(`row ${row} col ${col}`);
         go.fillColor = Math.random() * 0xFFFFFF;
       }, this);
-      cells.push(r);
+
+      this.labels.push(this.add.text(x, y, 'x',
+          {fontSize: '16px', color: '#000'}));
+
+      this.cells.push(r);
     }
 
-    container.add(cells);
+    container.add(this.cells);
+    container.add(this.labels);
 
     this.add.text(0, 0, (new Date()).toString(),
         {fontSize: '16px', color: '#000'});

@@ -1,9 +1,23 @@
+/* eslint-disable require-jsdoc */
 import Phaser from 'phaser';
 import config from './config';
-import GameScene from './scenes/Game';
+import Renderer from './scenes/Renderer';
+import store from './store';
+import {BoardManager} from './boardManager';
 
-new Phaser.Game(
-  Object.assign(config, {
-    scene: [GameScene]
-  })
-);
+class Controller {
+  boardManager;
+
+  constructor() {
+    this.boardManager = new BoardManager();
+
+    new Phaser.Game(
+        Object.assign(config, {
+          scene: [Renderer],
+        }),
+    );
+
+  }
+}
+
+new Controller();

@@ -1,12 +1,10 @@
 /* eslint-disable require-jsdoc */
+import store from './store';
 
 /*
-
 - stores/publishes board state
 - subscribes to user input and updates board state
-
  */
-import store from '../store';
 
 export class BoardManager {
   constructor() {
