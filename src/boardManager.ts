@@ -19,8 +19,10 @@ export class BoardManager {
     this.puzzle = loader.getPuzzle();
     const rows = this.puzzle.dimensions[0];
     const cols = this.puzzle.dimensions[1];
+    const regionWidth = this.puzzle.region[0];
+    const regionHeight = this.puzzle.region[1];
 
-    store.dispatch(setRowsCols([rows, cols]));
+    store.dispatch(setRowsCols([rows, cols, regionWidth, regionHeight]));
 
     const cellUpdates = this.puzzle.vals.map((v, i) => {
       const val = (this.puzzle.givens.includes(i)) ? v : 0;
@@ -42,7 +44,7 @@ export class BoardManager {
       const index = state.board.cols * row + col;
       if (!this.puzzle.givens.includes(index)) {
         const currVal = state.board.cells[index];
-        const newVal = (currVal + 1) % 5;
+        const newVal = (currVal + 1) % (this.puzzle.otherShapes.length + 2);
         const payload = [index, newVal];
         if (this.puzzle.vals[index] === newVal) {
           console.log('nice');

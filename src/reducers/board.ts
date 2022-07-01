@@ -8,11 +8,15 @@ const boardSlice = createSlice({
     cells: [] as number[],
     rows: 0,
     cols: 0,
+    regionWidth: 0,
+    regionHeight: 0,
   },
   reducers: {
     setRowsCols(state, action) {
       state.rows = action.payload[0];
       state.cols = action.payload[1];
+      state.regionWidth = action.payload[2];
+      state.regionHeight = action.payload[3];
     },
     updateCells(state, action) {
       state.cellUpdates = action.payload.cellUpdates;

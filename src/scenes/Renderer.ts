@@ -11,6 +11,8 @@ export default class Renderer extends Phaser.Scene {
   numCols = 0;
   cellWidth = 0;
   cellHeight = 0;
+  regionWidth = 0;
+  regionHeight = 0;
   canvasCenter!: {x: number, y: number};
 
   constructor() {
@@ -30,6 +32,8 @@ export default class Renderer extends Phaser.Scene {
       this.numCols = boardState.cols;
       this.cellWidth = 50; // todo: calc this based on row/cols
       this.cellHeight = 50;
+      this.regionWidth = boardState.regionWidth;
+      this.regionHeight = boardState.regionHeight;
       this.canvasCenter = {x: this.sys.game.canvas.width / 2,
         y: this.sys.game.canvas.height / 2};
       this.customCreate();
@@ -48,30 +52,33 @@ export default class Renderer extends Phaser.Scene {
   }
 
   create() {
-    this.add.circle(400, 300, 2, 0xFF0000).setDepth(2);
+    this.add.circle(400, 300, 2, 0xFF0000).setDepth(2); // for debug
     store.dispatch(loadBoardDataNow(true));
   }
 
   drawGrid() {
+    const darkAlpha = 0.4;
+    const lightAlpha = 0.1;
     const boardWidth = this.cellWidth * this.numCols;
     const boardHeight = this.cellHeight * this.numRows;
     const border = this.add.rectangle(this.canvasCenter.x, this.canvasCenter.y,
         boardWidth, boardHeight, 0x0, 0.0);
-    border.strokeColor = 0x0;
-    border.strokeAlpha = 0.4;
+    border.setStrokeStyle(2, 0x0, darkAlpha);
     border.isStroked = true;
 
     // vertical lines
     for (let col = 1; col < this.numCols; col++) {
       const x = this.cellWidth * (col - this.numCols / 2) +
             this.canvasCenter.x;
-      this.add.line(x, this.canvasCenter.y, 0, -0, 0, boardHeight, 0x0, 0.1);
+      const alpha = col % this.regionHeight == 0 ? darkAlpha : lightAlpha;
+      this.add.line(x, this.canvasCenter.y, 0, -0, 0, boardHeight, 0x0, alpha);
     }
     // horizontal lines
     for (let row = 1; row < this.numRows; row++) {
       const y = this.cellHeight * (row - this.numRows / 2) +
             this.canvasCenter.y;
-      this.add.line(this.canvasCenter.x, y, 0, 0, boardWidth, 0, 0x0, 0.1);
+      const alpha = row % this.regionWidth == 0 ? darkAlpha : lightAlpha;
+      this.add.line(this.canvasCenter.x, y, 0, 0, boardWidth, 0, 0x0, alpha);
     }
   }
 
