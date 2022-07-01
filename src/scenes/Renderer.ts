@@ -36,23 +36,25 @@ export default class Renderer extends Phaser.Scene {
       this.regionHeight = boardState.regionHeight;
       this.canvasCenter = {x: this.sys.game.canvas.width / 2,
         y: this.sys.game.canvas.height / 2};
-      this.customCreate();
+      this.setupBoard();
     }
 
     if (boardState.cellUpdates && boardState.cellUpdates.length > 0) {
-      boardState.cellUpdates.forEach( (update) => {
+      boardState.cellUpdates.forEach( (update: number[]) => {
         const index = update[0];
         const value = update[1];
         const shape = this.cells[index];
-        shape.setDebugLabel(value);
-        shape.setShape(value as Direction); // only do this when data updates
+        shape.setDebugLabel(value.toString());
+        const isAGiven = update.length === 3 && update[2] !== undefined;
+        shape.setShape(value as Direction, isAGiven);
       });
+
       store.dispatch(updateCells([]));
     }
   }
 
   create() {
-    this.add.circle(400, 300, 2, 0xFF0000).setDepth(2); // for debug
+    // this.add.circle(400, 300, 2, 0xFF0000).setDepth(2); // for debug
     store.dispatch(loadBoardDataNow(true));
   }
 
@@ -82,9 +84,7 @@ export default class Renderer extends Phaser.Scene {
     }
   }
 
-  customCreate() {
-    this.drawGrid();
-
+  addShapes() {
     for (let i = 0; i < this.numRows * this.numCols; i++) {
       const col: integer = i % this.numCols;
       const row: integer = ~~(i / this.numCols);
@@ -98,9 +98,15 @@ export default class Renderer extends Phaser.Scene {
           this.cellWidth, this.cellHeight);
       this.cells.push(shape);
     }
+  }
 
-    this.add.text(0, 0, (new Date()).toString(),
-        {fontSize: '12px', color: '#000'});
+  setupBoard() {
+    this.drawGrid();
+    this.addShapes();
+
+
+    // this.add.text(0, 0, (new Date()).toString(),
+    //     {fontSize: '12px', color: '#000'});
 
     this.input.on('gameobjectup', function(pointer: any, gameObject: any) {
       gameObject.emit('clicked', gameObject);

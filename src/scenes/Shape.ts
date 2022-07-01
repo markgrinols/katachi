@@ -44,9 +44,10 @@ export default class Shape {
     this.currentChild = null;
   }
 
-  setShape(dir: Direction) {
+  setShape(dir: Direction, isGiven: boolean) {
     this.tryRemoveCurrentChild();
 
+    const alpha = isGiven ? 0.7 : 1;
     switch (dir) {
       case Direction.None:
         this.currentChild = this.scene.add.rectangle(this.x, this.y,
@@ -54,20 +55,21 @@ export default class Shape {
         break;
       case Direction.Circle:
         this.currentChild = this.scene.add.circle(this.x, this.y,
-            this.cellWidth * 0.30, 0x666600);
+            this.cellWidth * 0.30, 0x666600).setAlpha(alpha);
         break;
       case Direction.Triangle:
         const ha = 35;
         this.currentChild = this.scene.add.triangle(this.x, this.y,
-            0, ha, ha, ha, ha/2, 0, 0x00FF00);
+            0, ha, ha, ha, ha/2, 0, 0x00FF00).setAlpha(alpha);
         break;
       case Direction.Square:
         this.currentChild = this.scene.add.rectangle(this.x, this.y,
-            this.cellWidth, this.cellHeight, 0x6666ff).setScale(0.6);
+            this.cellWidth, this.cellHeight, 0x6666ff)
+            .setScale(0.6).setAlpha(alpha);
         break;
       case Direction.Diamond:
         this.currentChild = this.scene.add.sprite(this.x, this.y, 'diamond')
-            .setScale(0.6).setTintFill(0xF0C0FF);
+            .setScale(0.6).setTintFill(0xF0C0FF).setAlpha(alpha);
         break;
       default:
         throw new Error();

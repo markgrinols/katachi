@@ -6,7 +6,7 @@ import {updateCells, setRowsCols} from './reducers/board';
 import {PuzzleLoader} from './PuzzleLoader';
 
 export class BoardManager {
-  puzzle!: {region: number[], dimensions: number[], circles: number,
+  puzzle!: {boxSize: number[], dimensions: number[], circles: number,
       otherShapes: number[], id: number, vals: number[], givens: number[]};
 
   constructor() {
@@ -19,14 +19,14 @@ export class BoardManager {
     this.puzzle = loader.getPuzzle();
     const rows = this.puzzle.dimensions[0];
     const cols = this.puzzle.dimensions[1];
-    const regionWidth = this.puzzle.region[0];
-    const regionHeight = this.puzzle.region[1];
+    const regionWidth = this.puzzle.boxSize[0];
+    const regionHeight = this.puzzle.boxSize[1];
 
     store.dispatch(setRowsCols([rows, cols, regionWidth, regionHeight]));
 
     const cellUpdates = this.puzzle.vals.map((v, i) => {
       const val = (this.puzzle.givens.includes(i)) ? v : 0;
-      return [i, val];
+      return [i, val, true];
     });
     store.dispatch(updateCells({cellUpdates}));
   }

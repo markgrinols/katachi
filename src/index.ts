@@ -24,10 +24,19 @@ new Controller();
 
 todo:
  - load board data from file on remote endpoint
- - when cell changes, evaluate good/bad
- - build out board in renderer after cols/rows has been set
- - hollow shapes
- - count determines number of shapes so - 2 is 'plus', 3 is triangle, 4 is square, 5 is star
+ - when cell changes (after short delay), evaluate
+      - does this row/col/box have any violations?
+      - is puzzle completed?
+ - convert all shapes to sprites - with transparent background
+   - uniform size will simplify creation
+      (just need a mapping from shape name to sprite name)
+      this will also fix the hit area problem
+   - hollow the shapes
+ - count determines number of shapes so - 2 is 'plus',
+     3 is triangle, 4 is square, 5 is star
  - stick with pastel colors for sure
+ - button to reset the puzzle
+ - visualization when box, col or row is not working
+ - visualization when the puzzle is completed
 
 */
