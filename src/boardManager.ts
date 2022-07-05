@@ -6,8 +6,8 @@ import {updateCells, setRowsCols} from './reducers/board';
 import {PuzzleLoader} from './PuzzleLoader';
 
 export class BoardManager {
-  puzzle!: {boxSize: number[], dimensions: number[], circles: number,
-      otherShapes: number[], id: number, vals: number[], givens: number[]};
+  puzzle!: {box_dimensions: number[], dimensions: number[], shape_counts: {},
+        id: number, solution: number[], givens: number[]};
 
   constructor() {
     store.subscribe(() => this.onStateUpdated());
@@ -19,12 +19,12 @@ export class BoardManager {
     this.puzzle = loader.getPuzzle();
     const rows = this.puzzle.dimensions[0];
     const cols = this.puzzle.dimensions[1];
-    const regionWidth = this.puzzle.boxSize[0];
-    const regionHeight = this.puzzle.boxSize[1];
+    const regionWidth = this.puzzle.box_dimensions[0];
+    const regionHeight = this.puzzle.box_dimensions[1];
 
     store.dispatch(setRowsCols([rows, cols, regionWidth, regionHeight]));
 
-    const cellUpdates = this.puzzle.vals.map((v, i) => {
+    const cellUpdates = this.puzzle.solution.map((v, i) => {
       const val = (this.puzzle.givens.includes(i)) ? v : 0;
       return [i, val, true];
     });
@@ -44,9 +44,10 @@ export class BoardManager {
       const index = state.board.cols * row + col;
       if (!this.puzzle.givens.includes(index)) {
         const currVal = state.board.cells[index];
-        const newVal = (currVal + 1) % (this.puzzle.otherShapes.length + 2);
+        const newVal = (currVal + 1) %
+            (Object.keys(this.puzzle.shape_counts).length + 1);
         const payload = [index, newVal];
-        if (this.puzzle.vals[index] === newVal) {
+        if (this.puzzle.solution[index] === newVal) {
           console.log('nice');
         }
         const cellUpdates = [payload];
