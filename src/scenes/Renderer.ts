@@ -89,9 +89,9 @@ export default class Renderer extends Phaser.Scene {
       const col: integer = i % this.numCols;
       const row: integer = ~~(i / this.numCols);
 
-      const x = this.cellWidth * (col - ~~(this.numCols / 2)) +
+      const x = this.cellWidth * (col - this.numCols / 2 + 0.5) +
             this.sys.game.canvas.width / 2;
-      const y = this.cellHeight * (row - ~~(this.numRows / 2)) +
+      const y = this.cellHeight * (row - this.numRows / 2 + 0.5) +
             this.sys.game.canvas.height / 2;
 
       const shape: Shape = new Shape(this, x, y, row, col,
@@ -103,11 +103,6 @@ export default class Renderer extends Phaser.Scene {
   setupBoard() {
     this.drawGrid();
     this.addShapes();
-
-
-    // this.add.text(0, 0, (new Date()).toString(),
-    //     {fontSize: '12px', color: '#000'});
-
     this.input.on('gameobjectup', function(pointer: any, gameObject: any) {
       gameObject.emit('clicked', gameObject);
     }, this);

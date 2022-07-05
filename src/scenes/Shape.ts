@@ -7,9 +7,9 @@ import Renderer from './Renderer';
 export enum Direction {
   None = 0,
   Circle,
-  Square,
   Triangle,
-  Diamond,
+  Square,
+  Star,
 }
 
 export default class Shape {
@@ -67,7 +67,7 @@ export default class Shape {
             this.cellWidth, this.cellHeight, 0x6666ff)
             .setScale(0.6).setAlpha(alpha);
         break;
-      case Direction.Diamond:
+      case Direction.Star:
         this.currentChild = this.scene.add.sprite(this.x, this.y, 'diamond')
             .setScale(0.6).setTintFill(0xF0C0FF).setAlpha(alpha);
         break;
@@ -76,11 +76,12 @@ export default class Shape {
     }
 
     this.currentChild.setInteractive();
-    this.currentChild.on('clicked', (go: Phaser.GameObjects.Rectangle) => {
+    this.currentChild.on('clicked', () => {
       store.dispatch(userClicked([this.row, this.col]));
     }, this);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setDebugLabel(s: string) {
     // this.debugLabel.text = s;
   }
