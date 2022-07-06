@@ -13,8 +13,8 @@ export default defineConfig({
           'typeof PLUGIN_CAMERA3D': "'false'",
           'typeof PLUGIN_FBINSTANT': "'false'",
           'typeof FEATURE_SOUND': "'true'"
-        })
-      ]
-    }
-  }
+        }),
+      ],
+    },
+  },
 });
