@@ -84,6 +84,14 @@ describe('getBox', () => {
   });
 });
 
+describe('getRowCol', () => {
+  it('should get row/col based on flat index', async () => {
+    const bm = new BoardManager();
+    const result = bm.getRowCol(10, 4);
+    expect(result).toEqual([2, 2]);
+  });
+});
+
 describe('areCountsLegal', () => {
   it('should report validity of shape counts', async () => {
     const bm = new BoardManager();
@@ -152,11 +160,11 @@ describe('isLegalMove', () => {
     puzzle['shape_counts'] = {1: 2, 2: 3, 3: 1};
     const board = [
       3, 1, 2, 2,
-      3, 2, 3, 2,
       2, 3, 1, 1,
+      3, 2, 3, 2,
       2, 3, 1, 2];
-    const result = bm.isLegalMove(puzzle, board, 1, 2);
-    expect(result).toEqual({'badrow': 1});
+    const result = bm.isLegalMove(puzzle, board, 2, 2);
+    expect(result).toEqual({issue: 'badrow', data: [2]});
   });
   it('should detect if a move is legal - neg col count', async () => {
     const bm = new BoardManager();
@@ -170,7 +178,7 @@ describe('isLegalMove', () => {
       2, 3, 1, 2,
       2, 3, 1, 2];
     const result = bm.isLegalMove(puzzle, board, 3, 3);
-    expect(result).toEqual({'badcol': 3});
+    expect(result).toEqual({issue: 'badcol', data: [3]});
   });
   it('should detect if a move is legal - neg box count', async () => {
     const bm = new BoardManager();
@@ -184,7 +192,21 @@ describe('isLegalMove', () => {
       2, 3, 1, 1,
       2, 3, 1, 2];
     const result = bm.isLegalMove(puzzle, board, 0, 0);
-    expect(result).toEqual({'badbox-counts': [0, 0]});
+    expect(result).toEqual({issue: 'badbox-count', data: [0, 0]});
+  });
+  it('should detect if a move is legal - neg box connection', async () => {
+    const bm = new BoardManager();
+    const puzzle = getBasePuzzle();
+    puzzle['dimensions'] = [4, 4];
+    puzzle['box_dimensions'] = [2, 4];
+    puzzle['shape_counts'] = {1: 3, 2: 3, 3: 3};
+    const board = [
+      3, 1, 2, 1,
+      3, 3, 1, 2,
+      2, 3, 1, 1,
+      2, 3, 1, 2];
+    const result = bm.isLegalMove(puzzle, board, 0, 0);
+    expect(result).toEqual({issue: 'badbox-connection', data: [0, 0]});
   });
   it('should detect if a move is legal - positive!', async () => {
     const bm = new BoardManager();
@@ -198,6 +220,6 @@ describe('isLegalMove', () => {
       1, 3, 2, 1,
       3, 3, 2, 2];
     const result = bm.isLegalMove(puzzle, board, 2, 1);
-    expect(result).toEqual({});
+    expect(result).toEqual({issue: '', data: []});
   });
 });

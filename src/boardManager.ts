@@ -1,7 +1,7 @@
 /* eslint-disable require-jsdoc */
 import {clearUserClicked} from './reducers/input';
 import {loadBoardDataNow} from './reducers/app';
-import {updateCells, setRowsCols} from './reducers/board';
+import {updateCells, updateError, setRowsCols} from './reducers/board';
 import {PuzzleLoader} from './PuzzleLoader';
 import store from './store';
 
@@ -152,6 +152,10 @@ export class BoardManager {
     return true;
   }
 
+  getRowCol(index: number, cols: number) {
+    return [~~(index / cols), index % cols];
+  }
+
   getBox(puzzle: PuzzleType, row: number, col: number) {
     const boxRows = puzzle['box_dimensions'][0];
     const boxCols = puzzle['box_dimensions'][1];
@@ -163,34 +167,31 @@ export class BoardManager {
   isLegalMove(puzzle: PuzzleType, board: number[], row: number, col: number) {
     let counts = this.getShapeCountsPerRow(puzzle, board, row);
     if (!this.areCountsLegal(puzzle['shape_counts'], counts)) {
-      return {'badrow': row};
+      return {issue: 'badrow', data: [row]};
     }
 
     counts = this.getShapeCountsPerCol(puzzle, board, col);
     if (!this.areCountsLegal(puzzle['shape_counts'], counts)) {
-      return {'badcol': col};
+      return {issue: 'badcol', data: [col]};
     }
 
     const [boxRow, boxCol] = this.getBox(puzzle, row, col);
     counts = this.getShapeCountsPerBox(puzzle, board, boxRow, boxCol);
     if (!this.areCountsLegal(puzzle['shape_counts'], counts)) {
-      return {'badbox-counts': [boxRow, boxCol]};
+      return {issue: 'badbox-count', data: [boxRow, boxCol]};
     }
 
     if (!this.areAllShapesConnected(puzzle, board, boxRow, boxCol)) {
-      return {'badbox-connections': [boxRow, boxCol]};
+      return {issue: 'badbox-connection', data: [boxRow, boxCol]};
     }
 
-    return {};
+    return {issue: '', data: []};
   }
 
-  checkBoard(index: number) {
-    console.log(`checkBoard fired ${index}`);
-    // check row
-    // check col
-    // check box
-    // in case of trouble, dispatch - boardError message
-    // if no trouble, send the clear messsage
+  checkBoard(puzzle: PuzzleType, board: number[], index: number) {
+    const [row, col] = this.getRowCol(index, puzzle['dimensions'][1]);
+    const result = this.isLegalMove(puzzle, board, row, col);
+    store.dispatch(updateError({result}));
   }
 
   async handleIncrementShape() {
@@ -214,7 +215,8 @@ export class BoardManager {
 
         const cellUpdates = [payload];
         store.dispatch(updateCells({cellUpdates}));
-        await this.delay(1000, () => this.checkBoard(index));
+        await this.delay(1000, () => this
+            .checkBoard(this.puzzle, state.board.cells, index));
       }
     }
   }

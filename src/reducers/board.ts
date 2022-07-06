@@ -10,6 +10,7 @@ const boardSlice = createSlice({
     cols: 0,
     regionWidth: 0,
     regionHeight: 0,
+    error: {issue: null, data: []},
   },
   reducers: {
     setRowsCols(state, action) {
@@ -24,9 +25,12 @@ const boardSlice = createSlice({
         state.cells[c[0]] = c[1];
       });
     },
+    updateError(state, action) {
+      state.error = action.payload;
+    },
   },
 });
 
 const {actions, reducer} = boardSlice;
-export const {updateCells, setRowsCols} = actions;
+export const {updateCells, updateError, setRowsCols} = actions;
 export default reducer;
