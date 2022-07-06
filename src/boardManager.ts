@@ -50,7 +50,8 @@ export class BoardManager {
 
   // *********************
 
-  getShapeCountsInList(numShapes: number, data: number[]) {
+  getShapeCountsInList(puzzle: PuzzleType, data: number[]) {
+    const numShapes = Object.keys(puzzle['shape_counts']).length;
     const counts: CountsType = {};
     for (let i:number = 1; i < numShapes + 1; i++) {
       const count = data.filter( (d) => d === i).length;
@@ -60,41 +61,50 @@ export class BoardManager {
   }
 
   getShapeCountsPerRow(puzzle: PuzzleType, board: number[], rowIndex: number) {
-    const numShapes = Object.keys(puzzle['shape_counts']).length;
     const cols = puzzle.dimensions[1];
     const start = cols * rowIndex;
     const rowData = board.slice(start, start + cols);
-    return this.getShapeCountsInList(numShapes, rowData);
+    return this.getShapeCountsInList(puzzle, rowData);
   }
 
   getShapeCountsPerCol(puzzle: PuzzleType, board: number[], colIndex: number) {
-    const numShapes = Object.keys(puzzle['shape_counts']).length;
     const cols = puzzle.dimensions[1];
     const start = colIndex;
     const colData = [];
     for (let i = start; i < board.length; i = i + cols) {
       colData.push(board[i]);
     }
-    return this.getShapeCountsInList(numShapes, colData);
+    return this.getShapeCountsInList(puzzle, colData);
   }
 
-// def get_shape_counts_per_box(puzzle, board, box_row, box_col):
-//   rows_in_box = puzzle['box_dimensions'][0]
-//   cols_in_box = puzzle['box_dimensions'][1]
-//   box_start_row = box_row * rows_in_box
-//   box_end_row = box_start_row + rows_in_box
-//   box_start_col = box_col * cols_in_box
-//   box_end_col = box_start_col + cols_in_box
-//   box_matrix = board[box_start_row:box_end_row, box_start_col:box_end_col]
-//   return get_shape_counts_in_list(get_shape_count(puzzle), box_matrix.flatten())
+  getShapeCountsPerBox(puzzle: PuzzleType, board: number[],
+      boxRow: number, boxCol: number) {
+    const cols = puzzle.dimensions[1];
+    const rowsInBox = puzzle['box_dimensions'][0];
+    const colsInBox = puzzle['box_dimensions'][1];
+    const boxStartRow = boxRow * rowsInBox;
+    const boxStartCol = boxCol * colsInBox;
 
+    const boxData = [];
+    for (let r = boxStartRow; r < boxStartRow + rowsInBox; r++) {
+      for (let c = boxStartCol; c < boxStartCol + colsInBox; c++) {
+        const i = r * cols + c;
+        boxData.push(board[i]);
+      }
+    }
 
-// def are_counts_legal(puzzle, counts):
-//   c = get_shape_count(puzzle)
-//   for s in range(1, c + 1):
-//       if counts[s] > puzzle['shape_counts'][s]:
-//           return False
-//   return True
+    return this.getShapeCountsInList(puzzle, boxData);
+  }
+
+  areCountsLegal(maxShapeCounts: CountsType, shapeCounts: CountsType) {
+    const c = Object.keys(maxShapeCounts).length;
+    for ( let s = 1; s < c + 1; s++) {
+      if (shapeCounts[s] > maxShapeCounts[s]) {
+        return false;
+      }
+      return true;
+    }
+  }
 
 // def are_all_shapes_connected(box_matrix, shape_counts):
 //   # get list of locations of each non circle shape
