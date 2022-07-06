@@ -40,14 +40,6 @@ export class BoardManager {
     store.dispatch(updateCells({cellUpdates}));
   }
 
-  // todo: move this to the view layer
-  async delay(ms: number, func: { (): void; (): any; }) {
-    await new Promise<void>( (resolve) => setTimeout(()=>resolve(), ms))
-        .then(() => func());
-  }
-  // cal this from an async message
-  //         await this.delay(1000, () => this.checkBoard(index));
-
   getShapeCountsInList(puzzle: PuzzleType, data: number[]) {
     const numShapes = Object.keys(puzzle['shape_counts']).length;
     const counts: CountsType = {};
@@ -207,7 +199,6 @@ export class BoardManager {
       store.dispatch(clearUserClicked(null));
       const row = inputState.click[0];
       const col = inputState.click[1];
-      console.log(`User clicked at: ${row} ${col}`);
 
       const index = state.board.cols * row + col;
       if (!this.puzzle.givens.includes(index)) {
@@ -216,15 +207,13 @@ export class BoardManager {
             (Object.keys(this.puzzle.shape_counts).length + 1);
         const payload = [index, newVal];
         if (this.puzzle.solution[index] === newVal) {
-          console.log('nice');
+          // console.log('nice');
         }
 
         const cellUpdates = [payload];
         store.dispatch(updateCells({cellUpdates}));
-        await this.delay(1000, () => {
-          const state = store.getState();
-          this.checkBoard(this.puzzle, state.board.cells, index);
-        });
+        const freshState = store.getState();
+        this.checkBoard(this.puzzle, freshState.board.cells, index);
       }
     }
   }

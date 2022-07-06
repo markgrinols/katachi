@@ -18,6 +18,7 @@ export default class Renderer extends Phaser.Scene {
   rowErrorShape!: Phaser.GameObjects.Rectangle;
   colErrorShape!: Phaser.GameObjects.Rectangle;
   boxErrorShape!: Phaser.GameObjects.Rectangle;
+  timeOfLastErrorUpdate = 0;
 
   constructor() {
     super('Renderer');
@@ -29,7 +30,12 @@ export default class Renderer extends Phaser.Scene {
     this.load.image('plus', 'assets/plus.png');
   }
 
-  onStateUpdated() {
+  async delay(ms: number, func: { (): void; (): any; }) {
+    await new Promise<void>( (resolve) => setTimeout(()=>resolve(), ms))
+        .then(() => func());
+  }
+
+  async onStateUpdated() {
     const state = store.getState();
     const boardState = state.board;
     if (this.numRows == 0 && boardState.rows > 0) {
@@ -57,18 +63,26 @@ export default class Renderer extends Phaser.Scene {
     }
 
     if (boardState.error.issue != this.previousError.issue) {
-      console.log(boardState.error);
-      const error = boardState.error;
-      this.previousError = error;
-      if (error.issue == '') {
+      this.timeOfLastErrorUpdate = Date.now();
+      if (boardState.error.issue == '') {
         this.hideErrorShapes();
-      } else if (error.issue == 'badrow') {
-        this.setRowError(error.data[0]);
-      } else if (error.issue == 'badcol') {
-        this.setColError(error.data[0]);
-      } else if (error.issue.startsWith('badbox')) {
-        this.setBoxError(error.data[0], error.data[1]);
       }
+      await this.delay(1100, () => {
+        // noop if another one was queued within the previous second
+        if (Date.now() - this.timeOfLastErrorUpdate > 1000) {
+          const error = store.getState().board.error;
+          if (error.issue == '') {
+            this.hideErrorShapes();
+          } else if (error.issue == 'badrow') {
+            this.setRowError(error.data[0]);
+          } else if (error.issue == 'badcol') {
+            this.setColError(error.data[0]);
+          } else if (error.issue.startsWith('badbox')) {
+            this.setBoxError(error.data[0], error.data[1]);
+          }
+          this.previousError = error;
+        }
+      });
     }
   }
 
@@ -154,7 +168,7 @@ export default class Renderer extends Phaser.Scene {
     this.colErrorShape.setVisible(true);
   }
 
-  setBoxError(boxCol: number, boxRow: number) {
+  setBoxError(boxRow: number, boxCol: number) {
     const x = this.cellWidth * this.regionWidth *
         (boxCol - this.numCols / this.regionWidth / 2 + 0.5) +
         this.canvasCenter.x;
