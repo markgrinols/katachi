@@ -106,55 +106,81 @@ export class BoardManager {
     }
   }
 
-// def are_all_shapes_connected(box_matrix, shape_counts):
-//   # get list of locations of each non circle shape
-//   # go through each and find any cell that shares row or col && other dim is only 1 away
-//   for s in shape_counts:
-//       if s == 1:
-//           continue  # skip circles
-//       matches = list(zip(*np.where(box_matrix==s)))
-//       for r0, c0 in matches:
-//           this_r0c0_has_at_least_one_matching_connector = False
-//           for r, c in matches:
-//               if (r0 == r and c0 == c):
-//                   continue
-//               if (r0 == r and abs(c0 - c) == 1) or \
-//                  (c0 == c and abs(r0 - r) == 1):
-//                   this_r0c0_has_at_least_one_matching_connector = True
-//           if not this_r0c0_has_at_least_one_matching_connector:
-//               return False
-//   return True
+  areAllShapesConnected(puzzle: PuzzleType, board: number[],
+      boxRow: number, boxCol: number) {
+  // get list of locations of each non circle shape
+  // go through each and find any cell that shares row or col
+  // && other dim is only 1 away
+    const cols = puzzle.dimensions[1];
+    const rowsInBox = puzzle['box_dimensions'][0];
+    const colsInBox = puzzle['box_dimensions'][1];
+    const boxStartRow = boxRow * rowsInBox;
+    const boxStartCol = boxCol * colsInBox;
 
-// def are_connections_valid(puzzle, board, box_row, box_col):
-//   rows_in_box = puzzle['box_dimensions'][0]
-//   cols_in_box = puzzle['box_dimensions'][1]
-//   box_start_row = box_row * rows_in_box
-//   box_end_row = box_start_row + rows_in_box
-//   box_start_col = box_col * cols_in_box
-//   box_end_col = box_start_col + cols_in_box
-//   box_matrix = board[box_start_row:box_end_row, box_start_col:box_end_col]
-//   if len(np.where(box_matrix==0)[0]) > 0:
-//       return True  # can't do next test if there are blank cells
-//   return are_all_shapes_connected(box_matrix, puzzle['shape_counts'])
+    for (let s = 1; s < Object.keys(puzzle['shape_counts']).length + 1; s++) {
+      if (s === 1) {
+        continue; // skip circles
+      }
 
-// def is_legal_move(puzzle, board, row, col):
-//   counts = get_shape_counts_per_row(puzzle, board, row)
-//   if not are_counts_legal(puzzle, counts):
-//       return {'badrow': row }
+      for (let baseR = boxStartRow; baseR < boxStartRow + rowsInBox; baseR++) {
+        for (let baseC = boxStartCol;
+          baseC < boxStartCol + colsInBox; baseC++) {
+          const i = baseR * cols + baseC;
+          if (board[i] !== s) {
+            continue;
+          }
+          let thisBaseHasAtLeastOneMatchingConnector = false;
+          for (let r = boxStartRow; r < boxStartRow + rowsInBox; r++) {
+            for (let c = boxStartCol; c < boxStartCol + colsInBox; c++) {
+              const j = r * cols + c;
+              if (board[j] !== s || (baseR == r && baseC == c)) {
+                continue;
+              }
+              if ((baseR == r && Math.abs(c - baseC) == 1) ||
+                  (baseC == c && Math.abs(r - baseR) == 1)) {
+                thisBaseHasAtLeastOneMatchingConnector = true;
+              }
+            }
+          }
+          if (!thisBaseHasAtLeastOneMatchingConnector) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
 
-//   counts = get_shape_counts_per_col(puzzle, board, col)
-//   if not are_counts_legal(puzzle, counts):
-//       return { 'badcol': col }
+  // def are_connections_valid(puzzle, board, box_row, box_col):
+  //   rows_in_box = puzzle['box_dimensions'][0]
+  //   cols_in_box = puzzle['box_dimensions'][1]
+  //   box_start_row = box_row * rows_in_box
+  //   box_end_row = box_start_row + rows_in_box
+  //   box_start_col = box_col * cols_in_box
+  //   box_end_col = box_start_col + cols_in_box
+  //   box_matrix = board[box_start_row:box_end_row, box_start_col:box_end_col]
+  //   if len(np.where(box_matrix==0)[0]) > 0:
+  //       return True  # can't do next test if there are blank cells
+  //   return are_all_shapes_connected(box_matrix, puzzle['shape_counts'])
 
-//   box_row, box_col = get_box(puzzle, row, col)
-//   counts = get_shape_counts_per_box(puzzle, board, box_row, box_col)
-//   if not are_counts_legal(puzzle, counts):
-//       return { 'badbox': [box_row, box_col] }
+  // def is_legal_move(puzzle, board, row, col):
+  //   counts = get_shape_counts_per_row(puzzle, board, row)
+  //   if not are_counts_legal(puzzle, counts):
+  //       return {'badrow': row }
 
-//   if not are_connections_valid(puzzle, board, box_row, box_col):
-//       return { 'badbox-connections': [box_row, box_col] }
+  //   counts = get_shape_counts_per_col(puzzle, board, col)
+  //   if not are_counts_legal(puzzle, counts):
+  //       return { 'badcol': col }
 
-//   return {}
+  //   box_row, box_col = get_box(puzzle, row, col)
+  //   counts = get_shape_counts_per_box(puzzle, board, box_row, box_col)
+  //   if not are_counts_legal(puzzle, counts):
+  //       return { 'badbox': [box_row, box_col] }
+
+  //   if not are_connections_valid(puzzle, board, box_row, box_col):
+  //       return { 'badbox-connections': [box_row, box_col] }
+
+  //   return {}
 
   // *********************
 

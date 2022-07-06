@@ -83,3 +83,38 @@ describe('areCountsLegal', () => {
     expect(result).toBe(true);
   });
 });
+
+// areAllShapesConnected(puzzle: PuzzleType, board: number[],
+//  boxRow: number, boxCol: number, shapeCounts: CountsType) {
+describe('areAllShapesConnected', () => {
+  it('should detect if all shapes in a box are conected - neg', async () => {
+    const bm = new BoardManager();
+    const puzzle = getBasePuzzle();
+    puzzle['dimensions'] = [4, 4];
+    puzzle['box_dimensions'] = [2, 4];
+    puzzle['shape_counts'] = {1: 2, 2: 3, 3: 3};
+    const board = [
+      0, 1, 2, 1,
+      3, 3, 0, 3,
+      2, 3, 0, 1,
+      2, 3, 1, 2];
+
+    const counts = bm.areAllShapesConnected(puzzle, board, 0, 0);
+    expect(counts).toEqual(false);
+  });
+  it('should detect if all shapes in a box are conected - pos', async () => {
+    const bm = new BoardManager();
+    const puzzle = getBasePuzzle();
+    puzzle['dimensions'] = [4, 4];
+    puzzle['box_dimensions'] = [2, 4];
+    puzzle['shape_counts'] = {1: 2, 2: 3, 3: 3};
+    const board = [
+      0, 2, 2, 1,
+      3, 3, 2, 0,
+      2, 3, 0, 1,
+      2, 3, 1, 2];
+
+    const counts = bm.areAllShapesConnected(puzzle, board, 0, 0);
+    expect(counts).toEqual(true);
+  });
+});
