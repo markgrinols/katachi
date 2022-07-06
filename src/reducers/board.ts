@@ -10,7 +10,7 @@ const boardSlice = createSlice({
     cols: 0,
     regionWidth: 0,
     regionHeight: 0,
-    error: {issue: null, data: []},
+    error: {issue: '', data: []},
   },
   reducers: {
     setRowsCols(state, action) {

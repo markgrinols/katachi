@@ -115,6 +115,15 @@ export class BoardManager {
     const boxStartRow = boxRow * rowsInBox;
     const boxStartCol = boxCol * colsInBox;
 
+    for (let r = boxStartRow; r < boxStartRow + rowsInBox; r++) {
+      for (let c = boxStartCol; c < boxStartCol + colsInBox; c++) {
+        const i = r * cols + c;
+        if (board[i] == 0) {
+          return true; // don't do this evaluation of the box has blanks
+        }
+      }
+    }
+
     for (let s = 1; s < Object.keys(puzzle['shape_counts']).length + 1; s++) {
       if (s === 1) {
         continue; // skip circles
@@ -124,9 +133,6 @@ export class BoardManager {
         for (let baseC = boxStartCol;
           baseC < boxStartCol + colsInBox; baseC++) {
           const i = baseR * cols + baseC;
-          if (board[i] == 0) {
-            return true; // don't do this evaluation of the box has blanks
-          }
           if (board[i] !== s) {
             continue;
           }
@@ -191,7 +197,7 @@ export class BoardManager {
   checkBoard(puzzle: PuzzleType, board: number[], index: number) {
     const [row, col] = this.getRowCol(index, puzzle['dimensions'][1]);
     const result = this.isLegalMove(puzzle, board, row, col);
-    store.dispatch(updateError({result}));
+    store.dispatch(updateError(result));
   }
 
   async handleIncrementShape() {
@@ -215,8 +221,10 @@ export class BoardManager {
 
         const cellUpdates = [payload];
         store.dispatch(updateCells({cellUpdates}));
-        await this.delay(1000, () => this
-            .checkBoard(this.puzzle, state.board.cells, index));
+        await this.delay(1000, () => {
+          const state = store.getState();
+          this.checkBoard(this.puzzle, state.board.cells, index);
+        });
       }
     }
   }

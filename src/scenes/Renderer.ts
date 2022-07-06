@@ -14,6 +14,7 @@ export default class Renderer extends Phaser.Scene {
   regionWidth = 0;
   regionHeight = 0;
   canvasCenter!: {x: number, y: number};
+  previousBoardState = {issue: 'none', data: []};
 
   constructor() {
     super('Renderer');
@@ -50,6 +51,11 @@ export default class Renderer extends Phaser.Scene {
       });
 
       store.dispatch(updateCells([]));
+    }
+
+    if (boardState.error != this.previousBoardState) {
+      console.log(boardState.error);
+      this.previousBoardState = boardState.error;
     }
   }
 
