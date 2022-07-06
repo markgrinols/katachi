@@ -7,9 +7,10 @@ import Renderer from './Renderer';
 export enum Direction {
   None = 0,
   Circle,
+  Plus,
   Triangle,
   Square,
-  Star,
+  // Star,
 }
 
 export default class Shape {
@@ -48,6 +49,7 @@ export default class Shape {
     this.tryRemoveCurrentChild();
 
     const alpha = isGiven ? 0.7 : 1;
+
     switch (dir) {
       case Direction.None:
         this.currentChild = this.scene.add.rectangle(this.x, this.y,
@@ -56,6 +58,10 @@ export default class Shape {
       case Direction.Circle:
         this.currentChild = this.scene.add.circle(this.x, this.y,
             this.cellWidth * 0.30, 0x666600).setAlpha(alpha);
+        break;
+      case Direction.Plus:
+        this.currentChild = this.scene.add.sprite(this.x, this.y, 'plus')
+            .setScale(0.6).setTintFill(0xF0C0FF).setAlpha(alpha);
         break;
       case Direction.Triangle:
         const ha = 35;
@@ -67,10 +73,10 @@ export default class Shape {
             this.cellWidth, this.cellHeight, 0x6666ff)
             .setScale(0.6).setAlpha(alpha);
         break;
-      case Direction.Star:
-        this.currentChild = this.scene.add.sprite(this.x, this.y, 'diamond')
-            .setScale(0.6).setTintFill(0xF0C0FF).setAlpha(alpha);
-        break;
+      // case Direction.Star:
+      //   this.currentChild = this.scene.add.sprite(this.x, this.y, 'diamond')
+      //       .setScale(0.6).setTintFill(0xF0C0FF).setAlpha(alpha);
+      //   break;
       default:
         throw new Error();
     }
@@ -83,6 +89,6 @@ export default class Shape {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setDebugLabel(s: string) {
-    // this.debugLabel.text = s;
+    this.debugLabel.text = s;
   }
 }

@@ -22,6 +22,7 @@ export default class Renderer extends Phaser.Scene {
 
   preload() {
     this.load.image('diamond', 'assets/diamond.png');
+    this.load.image('plus', 'assets/plus.png');
   }
 
   onStateUpdated() {
@@ -44,7 +45,6 @@ export default class Renderer extends Phaser.Scene {
         const index = update[0];
         const value = update[1];
         const shape = this.cells[index];
-        shape.setDebugLabel(value.toString());
         const isAGiven = update.length === 3 && update[2] !== undefined;
         shape.setShape(value as Direction, isAGiven);
       });
@@ -54,7 +54,6 @@ export default class Renderer extends Phaser.Scene {
   }
 
   create() {
-    // this.add.circle(400, 300, 2, 0xFF0000).setDepth(2); // for debug
     store.dispatch(loadBoardDataNow(true));
   }
 
