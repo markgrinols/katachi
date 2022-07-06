@@ -14,7 +14,10 @@ export default class Renderer extends Phaser.Scene {
   regionWidth = 0;
   regionHeight = 0;
   canvasCenter!: {x: number, y: number};
-  previousBoardState = {issue: 'none', data: []};
+  previousError = {issue: '', data: []};
+  rowErrorShape!: Phaser.GameObjects.Rectangle;
+  colErrorShape!: Phaser.GameObjects.Rectangle;
+  boxErrorShape!: Phaser.GameObjects.Rectangle;
 
   constructor() {
     super('Renderer');
@@ -53,9 +56,19 @@ export default class Renderer extends Phaser.Scene {
       store.dispatch(updateCells([]));
     }
 
-    if (boardState.error != this.previousBoardState) {
+    if (boardState.error.issue != this.previousError.issue) {
       console.log(boardState.error);
-      this.previousBoardState = boardState.error;
+      const error = boardState.error;
+      this.previousError = error;
+      if (error.issue == '') {
+        this.hideErrorShapes();
+      } else if (error.issue == 'badrow') {
+        this.setRowError(error.data[0]);
+      } else if (error.issue == 'badcol') {
+        this.setColError(error.data[0]);
+      } else if (error.issue.startsWith('badbox')) {
+        this.setBoxError(error.data[0], error.data[1]);
+      }
     }
   }
 
@@ -77,16 +90,38 @@ export default class Renderer extends Phaser.Scene {
     for (let col = 1; col < this.numCols; col++) {
       const x = this.cellWidth * (col - this.numCols / 2) +
             this.canvasCenter.x;
-      const alpha = col % this.regionHeight == 0 ? darkAlpha : lightAlpha;
+      const alpha = col % this.regionWidth == 0 ? darkAlpha : lightAlpha;
       this.add.line(x, this.canvasCenter.y, 0, -0, 0, boardHeight, 0x0, alpha);
     }
     // horizontal lines
     for (let row = 1; row < this.numRows; row++) {
       const y = this.cellHeight * (row - this.numRows / 2) +
             this.canvasCenter.y;
-      const alpha = row % this.regionWidth == 0 ? darkAlpha : lightAlpha;
+      const alpha = row % this.regionHeight == 0 ? darkAlpha : lightAlpha;
       this.add.line(this.canvasCenter.x, y, 0, 0, boardWidth, 0, 0x0, alpha);
     }
+  }
+
+  setupErrorShapes() {
+    const boardWidth = this.cellWidth * this.numCols;
+    const boardHeight = this.cellHeight * this.numRows;
+    const margin = 2;
+    this.rowErrorShape = this.add.rectangle(this.canvasCenter.x,
+        this.canvasCenter.y,
+        boardWidth - margin, this.cellHeight - margin, 0x0, 0.0);
+    this.rowErrorShape.setStrokeStyle(1, 0xFF0000, 0.5).setDepth(1);
+    this.rowErrorShape.setVisible(false);
+    this.colErrorShape = this.add.rectangle(this.canvasCenter.x,
+        this.canvasCenter.y,
+        this.cellWidth - margin, boardHeight - margin, 0x0, 0.0);
+    this.colErrorShape.setStrokeStyle(1, 0xFF0000, 0.5).setDepth(1);
+    this.colErrorShape.setVisible(false);
+    this.boxErrorShape = this.add.rectangle(this.canvasCenter.x,
+        this.canvasCenter.y,
+        this.cellWidth * this.regionWidth - margin,
+        this.cellHeight * this.regionHeight - margin, 0x0, 0.0);
+    this.boxErrorShape.setStrokeStyle(1, 0xFF0000, 0.5).setDepth(1);
+    this.boxErrorShape.setVisible(false);
   }
 
   addShapes() {
@@ -105,9 +140,42 @@ export default class Renderer extends Phaser.Scene {
     }
   }
 
+  setRowError(row: number) {
+    const y = this.cellHeight * (row - this.numRows / 2 + 0.5) +
+        this.canvasCenter.y;
+    this.rowErrorShape.setY(y);
+    this.rowErrorShape.setVisible(true);
+  }
+
+  setColError(col: number) {
+    const x = this.cellWidth * (col - this.numCols / 2 + 0.5) +
+        this.canvasCenter.x;
+    this.colErrorShape.setX(x);
+    this.colErrorShape.setVisible(true);
+  }
+
+  setBoxError(boxCol: number, boxRow: number) {
+    const x = this.cellWidth * this.regionWidth *
+        (boxCol - this.numCols / this.regionWidth / 2 + 0.5) +
+        this.canvasCenter.x;
+    const y = this.cellHeight * this.regionHeight *
+        (boxRow - this.numRows / this.regionHeight / 2 + 0.5) +
+        this.canvasCenter.y;
+    this.boxErrorShape.setX(x);
+    this.boxErrorShape.setY(y);
+    this.boxErrorShape.setVisible(true);
+  }
+
+  hideErrorShapes() {
+    this.rowErrorShape.setVisible(false);
+    this.colErrorShape.setVisible(false);
+    this.boxErrorShape.setVisible(false);
+  }
+
   setupBoard() {
     this.drawGrid();
     this.addShapes();
+    this.setupErrorShapes();
     this.input.on('gameobjectup', function(pointer: any, gameObject: any) {
       gameObject.emit('clicked', gameObject);
     }, this);

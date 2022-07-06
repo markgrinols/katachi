@@ -28,8 +28,8 @@ export class BoardManager {
     this.puzzle = loader.getPuzzle();
     const rows = this.puzzle.dimensions[0];
     const cols = this.puzzle.dimensions[1];
-    const regionWidth = this.puzzle.box_dimensions[0];
-    const regionHeight = this.puzzle.box_dimensions[1];
+    const regionWidth = this.puzzle.box_dimensions[1];
+    const regionHeight = this.puzzle.box_dimensions[0];
 
     store.dispatch(setRowsCols([rows, cols, regionWidth, regionHeight]));
 
