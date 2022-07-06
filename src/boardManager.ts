@@ -48,8 +48,6 @@ export class BoardManager {
   // cal this from an async message
   //         await this.delay(1000, () => this.checkBoard(index));
 
-  // *********************
-
   getShapeCountsInList(puzzle: PuzzleType, data: number[]) {
     const numShapes = Object.keys(puzzle['shape_counts']).length;
     const counts: CountsType = {};
@@ -102,8 +100,8 @@ export class BoardManager {
       if (shapeCounts[s] > maxShapeCounts[s]) {
         return false;
       }
-      return true;
     }
+    return true;
   }
 
   areAllShapesConnected(puzzle: PuzzleType, board: number[],
@@ -126,6 +124,9 @@ export class BoardManager {
         for (let baseC = boxStartCol;
           baseC < boxStartCol + colsInBox; baseC++) {
           const i = baseR * cols + baseC;
+          if (board[i] == 0) {
+            return true; // don't do this evaluation of the box has blanks
+          }
           if (board[i] !== s) {
             continue;
           }
@@ -151,39 +152,37 @@ export class BoardManager {
     return true;
   }
 
-  // def are_connections_valid(puzzle, board, box_row, box_col):
-  //   rows_in_box = puzzle['box_dimensions'][0]
-  //   cols_in_box = puzzle['box_dimensions'][1]
-  //   box_start_row = box_row * rows_in_box
-  //   box_end_row = box_start_row + rows_in_box
-  //   box_start_col = box_col * cols_in_box
-  //   box_end_col = box_start_col + cols_in_box
-  //   box_matrix = board[box_start_row:box_end_row, box_start_col:box_end_col]
-  //   if len(np.where(box_matrix==0)[0]) > 0:
-  //       return True  # can't do next test if there are blank cells
-  //   return are_all_shapes_connected(box_matrix, puzzle['shape_counts'])
+  getBox(puzzle: PuzzleType, row: number, col: number) {
+    const boxRows = puzzle['box_dimensions'][0];
+    const boxCols = puzzle['box_dimensions'][1];
+    const boxRow = ~~(row / boxRows);
+    const boxCol = ~~(col / boxCols);
+    return [boxRow, boxCol];
+  }
 
-  // def is_legal_move(puzzle, board, row, col):
-  //   counts = get_shape_counts_per_row(puzzle, board, row)
-  //   if not are_counts_legal(puzzle, counts):
-  //       return {'badrow': row }
+  isLegalMove(puzzle: PuzzleType, board: number[], row: number, col: number) {
+    let counts = this.getShapeCountsPerRow(puzzle, board, row);
+    if (!this.areCountsLegal(puzzle['shape_counts'], counts)) {
+      return {'badrow': row};
+    }
 
-  //   counts = get_shape_counts_per_col(puzzle, board, col)
-  //   if not are_counts_legal(puzzle, counts):
-  //       return { 'badcol': col }
+    counts = this.getShapeCountsPerCol(puzzle, board, col);
+    if (!this.areCountsLegal(puzzle['shape_counts'], counts)) {
+      return {'badcol': col};
+    }
 
-  //   box_row, box_col = get_box(puzzle, row, col)
-  //   counts = get_shape_counts_per_box(puzzle, board, box_row, box_col)
-  //   if not are_counts_legal(puzzle, counts):
-  //       return { 'badbox': [box_row, box_col] }
+    const [boxRow, boxCol] = this.getBox(puzzle, row, col);
+    counts = this.getShapeCountsPerBox(puzzle, board, boxRow, boxCol);
+    if (!this.areCountsLegal(puzzle['shape_counts'], counts)) {
+      return {'badbox-counts': [boxRow, boxCol]};
+    }
 
-  //   if not are_connections_valid(puzzle, board, box_row, box_col):
-  //       return { 'badbox-connections': [box_row, box_col] }
+    if (!this.areAllShapesConnected(puzzle, board, boxRow, boxCol)) {
+      return {'badbox-connections': [boxRow, boxCol]};
+    }
 
-  //   return {}
-
-  // *********************
-
+    return {};
+  }
 
   checkBoard(index: number) {
     console.log(`checkBoard fired ${index}`);
